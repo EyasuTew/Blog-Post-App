@@ -20,7 +20,8 @@ function errorHandler(err, req, res, next) {
 
 /* eslint-disable-next-line no-unused-vars */
 function auth(req, res, next) {
-  const token = req.headers['x-access-token'];
+  //console.log(req)
+ const token = req.headers['x-access-token'];
   if (token) {
     jwt.verify(token, process.env.SESSION_SECRET, (err, decoded) => {
       if (err) {
@@ -37,7 +38,7 @@ function auth(req, res, next) {
           return next();
         })
         .catch(() => {
-          next();
+         // next();
         });
     });
   } else {
