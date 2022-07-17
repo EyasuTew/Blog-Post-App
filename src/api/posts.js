@@ -83,11 +83,66 @@ router.get('/', async (req, res, next) => {
 */
 
 router.patch("/:postId",(req, res) => {
+  if (!req.user) {
+    return res.sendStatus(401);
+  }
+  console.log("user =="+req.user.id)
+  console.log(req.user)
+  console.log(req.user.id)
+
   console.log("tagId is set to " + req.params.postId);
+
   Post.findOne({ where: { id:   req.params.postId} }).
   then(function(post) {
+    //check if post is null
+    if(!post){
+      //res
+      res.status(404).json({"error":"Post not found"})
+    }else{
 
-    Post.update(
+      Post.findOne({
+        include: [
+          {
+            model: UserPost,
+            attributes: [],
+            where: {
+              userId: [req.user.id],
+              postId: post.id
+            },
+          },
+        ],
+      }).then(function(data){
+        if(!data){
+          res.status(401).json({"error":"Unauthorized operation"})
+        }else{
+          //res.json({"data":data})
+          Post.update(
+            { text:req.body.text },
+            { where:{ id : req.params.postId } },
+            { multi: false }
+          )
+          .then(function(rowsUpdated) {
+            console.log("update res")
+            console.log(rowsUpdated)
+            Post.findOne({ where: { id:   req.params.postId} }).
+            then(function(recentData){
+              res.json(recentData)
+            })
+          })
+          .catch(function(err){
+            res.json(err)
+          })
+        }
+      })
+    }
+    // console.log("post")
+    // console.log(post)
+    // res.json(post)
+
+    
+
+    // check if user is auther of the post
+    /*Post.update(
       { text:'a very different title now' },
       { where:{ id : 1 } },
       { multi: false }
@@ -97,7 +152,7 @@ router.patch("/:postId",(req, res) => {
     })
     .catch(function(err){
       res.json(err)
-    })
+    })*/
     
  }).catch(function(err) {
    res.json({"error":err})
