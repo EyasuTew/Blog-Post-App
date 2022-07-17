@@ -2,7 +2,7 @@
 
 ## Question 1
 I will add a Role column to on user_post table so each user_post relationship would have a corresponding Role. 
-To confirm that at least one of the entries in the connection was an Owner. Then Role will has assosicated permissions , permissions for example user with Owner Role of the post will has permissions like Write, Read, Delete, Update. So Role will have many to many relationship with Permission table. Based on the role and assoicated permission to the role in specific post we can limit the operation different user can perform on specific post. This table would make it easier to add new roles and permissions as needed, without necessitating the modification code.
+To confirm that at least one of the entries in the connection was an Owner. Then Role will has assosicated permissions , permissions for example user with Owner Role of the post will has permissions like Write, Read, Delete, Update. So Role will have many to many relationship with Permission table. Based on the role and assoicated permission to the role in specific post we can limit the operation different user can perform on specific post. This table would make it easier to add new roles and permissions as needed, without necessitating the modification code. The database schema design will be available below question 2.
 
 
 ## Question 2
