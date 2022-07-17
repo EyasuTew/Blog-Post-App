@@ -41,18 +41,33 @@ const Post = db.define(
   }
 );
 
-Post.getPostsByUserId = async function (userId) {
-  console.log("Test Get by id")
+// Post.getPostsByUserId = async function (userId) {
+//   console.log("Test Get by id")
+//   return Post.findAll({
+//     include: [
+//       {
+//         model: UserPost,
+//         attributes: [],
+//         where: {
+//           userId: [userId],
+//         },
+//       },
+//     ],
+//    });
+// };
+Post.getPostsByUserId = async function (userIds, sortBy = 'id', order = 'asc') {
+  
   return Post.findAll({
     include: [
       {
         model: UserPost,
         attributes: [],
         where: {
-          userId: [userId],
+          userId: userIds,
         },
       },
     ],
+    order: [[sortBy, order]],
   });
 };
 
