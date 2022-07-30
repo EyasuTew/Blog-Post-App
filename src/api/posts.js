@@ -1,6 +1,6 @@
 const express = require('express');
 const { Post, UserPost } = require('../db/models');
-const auth = require('../middlewares')
+const auth = require('../middlewares');
 
 const {
   updateValuesHelper,
@@ -46,48 +46,48 @@ router.post('/', async (req, res, next) => {
   }
 });
 
- /*@path /api/posts/
+/*@path /api/posts/
  * @method GET
  * @desc Get all posts by authorIds, sort by sortBy and direction (asc or desc)
  * @params authorIds,sortBy and direction
  * */
 router.get('/', async (req, res, next) => {
-  
-   authorIds=req.query.authorIds;
-   sortBy=req.query.sortBy;
-   direction=req.query.direction;
+  authorIds = req.query.authorIds;
+  sortBy = req.query.sortBy;
+  direction = req.query.direction;
 
   if (!req.user) {
     return res.status(401).json({ error: 'Not Authorized' });
-  }else{
-
-  if (!authorIds) {
-    return res
-      .status(400)
-      .json({ error: 'Must provide authorIds for the posts' });
-  }else{
-    const authorIdsInt = authorIds.split(',')//.map(Number);
-    const posts = await Post.getPostsByUserId(authorIdsInt, sortBy, direction);
-    posts.map((post)=>post.tags=post.tags.split(","))
-    return res.json({ posts });
+  } else {
+    if (!authorIds) {
+      return res
+        .status(400)
+        .json({ error: 'Must provide authorIds for the posts' });
+    } else {
+      const authorIdsInt = authorIds.split(','); //.map(Number);
+      const posts = await Post.getPostsByUserId(
+        authorIdsInt,
+        sortBy,
+        direction
+      );
+      posts.map((post) => (post.tags = post.tags.split(',')));
+      return res.json({ posts });
+    }
   }
-}
-
 });
 
-
 /*
-* Request sent to API, and if no err, it will return success 
-* @path /api/posts/:postId
-* @method PATCH
-*/
+ * Request sent to API, and if no err, it will return success
+ * @path /api/posts/:postId
+ * @method PATCH
+ */
 router.patch('/:postId', async (req, res, next) => {
   try {
     // Authentication
     if (!req.user) {
       return res.status(401).json({ error: 'Not Authorized' });
     }
-    const postId  = req.params.postId;
+    const postId = req.params.postId;
     const authorIds = req.body.authorIds;
     const tags = req.body.tags;
     const text = req.body.text;
@@ -96,13 +96,10 @@ router.patch('/:postId', async (req, res, next) => {
       where: {
         id: postId,
       },
-
     });
     // Check if post exists
     if (!postCheckExist) {
-      return res
-        .status(404)
-        .json({ error: 'Post not found' });
+      return res.status(404).json({ error: 'Post not found' });
     }
 
     const post = await Post.findOne({
@@ -130,29 +127,27 @@ router.patch('/:postId', async (req, res, next) => {
     if (authorIds) {
       await updateAssociationsHelper(post, authorIds, req.user.id);
     }
-    let updateValues={}
-    if(text){
-      updateValues["text"]=req.body.text
+    let updateValues = {};
+    if (text) {
+      updateValues['text'] = req.body.text;
     }
-    if(tags){
-      updateValues["tags"]=req.body.tags.join(",")
+    if (tags) {
+      updateValues['tags'] = req.body.tags.join(',');
     }
     if (text || tags) {
       await Post.update(
         updateValues,
-        { where:{ id : req.params.postId } },
+        { where: { id: req.params.postId } },
         { multi: false }
-      )
+      );
     }
-
 
     const updatedPost = await Post.findOne({
       where: {
         id: postId,
       },
-
-    })
-    updatedPost.dataValues.tags =updatedPost.dataValues.tags.split(",")
+    });
+    updatedPost.dataValues.tags = updatedPost.dataValues.tags.split(',');
 
     const serialize = updatedPost.get({ plain: true });
 
@@ -172,21 +167,24 @@ router.patch('/:postId', async (req, res, next) => {
       return res.status(404).json({ error: 'Author or User not found' });
     }
     if (error.name === 'SequelizeValidationError') {
-      return res.status(400).json({ error: "Error on values or Invalid values" });
+      return res
+        .status(400)
+        .json({ error: 'Error on values or Invalid values' });
     }
     next(error);
   }
 });
 
-
-router.get('/ping',(req, res) => {
+router.get('/ping', (req, res) => {
   let tag = req.query.tag;
   res.setHeader('Content-Type', 'application/json');
-  helper.getData(htc_url,{tag}).then(data => {
-      res.send({"success": true}).statusCode(200)
-  }).catch(data => {
-      res.send({"success": false}).statusCode(500)
-  })
-  
-})
+  helper
+    .getData(htc_url, { tag })
+    .then((data) => {
+      res.send({ success: true }).statusCode(200);
+    })
+    .catch((data) => {
+      res.send({ success: false }).statusCode(500);
+    });
+});
 module.exports = router;

@@ -42,7 +42,6 @@ const Post = db.define(
 );
 
 Post.getPostsByUserId = async function (userIds, sortBy = 'id', order = 'asc') {
-  
   return Post.findAll({
     include: [
       {
